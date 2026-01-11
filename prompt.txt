@@ -1,0 +1,245 @@
+You are an expert full-stack AI developer. Your task is to **generate a complete Car Marketplace + Rental Platform** from scratch using **React JS frontend** and **Spring Boot backend**, step by step, covering **all phases, features, roles, UI/UX, API standards, error handling, and validations**, in one go. The project should be fully modular, scalable, and production-ready. Export the generated code in a structure ready to run.
+
+---
+
+## 1. Project Overview
+
+* Platform: Buy, Sell, and Rent Cars
+* Users: Buyer, Renter, Seller/Dealer
+* Admins: Super Admin, Admin/Moderator
+* Roles: Agent/Broker, Support Staff, Finance/Accountant, Content Manager
+* Key Principles:
+
+  * API response: `{ "statusCode": <code>, "statusMessage": "<message>", "data": {} }`
+  * All codes and messages from centralized constants
+  * Backend validates all inputs even if frontend validates
+  * Full error handling with global exception handler
+  * Use DTOs for requests/responses
+  * Frontend should be clean, responsive, and visually appealing
+
+---
+
+## 2. Tech Stack
+
+* Frontend: React JS, JSX, React Router, Axios, Tailwind CSS / Chakra UI, Context/Redux
+* Backend: Spring Boot, Spring Security (JWT), Spring Data JPA , Modular architecture
+* Database:  MySQL
+* Optional: Redis for caching, ElasticSearch for search
+* Testing: JUnit (backend), React Testing Library (frontend)
+
+---
+
+## 3. Folder Structure
+
+**Backend**
+
+```
+src/main/java/com/marketplace/
+├─ config/         # Security, JWT, DB
+├─ constants/      # Status codes, messages, roles
+├─ controller/     # REST APIs
+├─ service/        # Business logic
+├─ service/impl/   # Service implementations
+├─ repository/     # JPA Repositories
+├─ model/          # Entities & DTOs
+├─ exception/      # Custom Exceptions
+├─ payload/        # ApiResponse, request/response DTOs
+├─ util/           # Utilities
+└─ security/       # JWT filters, role guards
+```
+
+**Frontend**
+
+```
+src/
+├─ assets/         # Images, icons, videos
+├─ components/     # Reusable UI components
+├─ pages/          # Landing, Home, Sell, Rent, Profile, Admin, etc.
+├─ services/       # Axios API calls, auth services
+├─ context/        # Auth/User context
+├─ hooks/          # Custom hooks
+├─ utils/          # Constants, helpers
+├─ routes/         # Route definitions + guards
+└─ App.jsx
+```
+
+---
+
+## 4. Features & Phases
+
+### Phase 1 — Core Marketplace (MVP)
+
+**User & Authentication**
+
+* Registration (email/phone)
+* Login (email/phone + password)
+* JWT authentication
+* Password reset
+* User profile management
+* Role management (User / Admin / Dealer)
+
+**Car Sell Listings**
+
+* Create/edit/delete listing
+* Fields: title, description, price, make, model, year, mileage, photos, location
+* List cars by owner/dealer
+* Search/filter: make/model, price range, year, location
+* View listing details
+* Contact seller (inquiry form)
+* Optional dealer verification badge
+
+**Car Rental Listings**
+
+* Create/edit/delete rental listings
+* Daily/weekly/monthly rates
+* Availability calendar
+* Deposit rules
+* Search/filter: location, price, dates, car type
+* Rental availability check
+* Booking workflow (request, confirm, history, cancel)
+
+---
+
+### Phase 2 — Medium Priority Enhancements
+
+* Wishlist (saved favorites)
+* Recently viewed listings
+* Pagination / infinite scroll
+* Image gallery with zoom
+* Sorting (price, newest, mileage)
+* Featured / premium listings
+* Multiple photos/video uploads
+* In-app messaging (owner ↔ user)
+* Email & SMS notifications
+
+---
+
+### Phase 3 — Admin & Operations
+
+* Admin login
+* Approve/reject listings
+* View users & seller activities
+* Block/suspend users
+* Manage categories (make/model)
+* Reports: total sales, rentals, bookings
+* Activity logs & audit trails
+* Role-based permissions
+
+---
+
+### Phase 4 — Monetization
+
+* Paid listing packages
+* Dealer subscriptions
+* Commission on rentals
+* Discounts / coupon codes
+* SEO optimization
+* Google Analytics integration
+* Social sharing (Facebook, Twitter, WhatsApp)
+* Promotion banners
+
+---
+
+### Phase 5 — User Trust & Value Adds
+
+* Reviews & ratings (cars/sellers)
+* Verified seller badge
+* Vehicle inspection module
+* Price estimation / market value suggestions
+* Saved comparisons (2–3 cars)
+
+---
+
+### Phase 6 — Analytics & Reports
+
+* User activity analytics (heatmaps)
+* Listing performance metrics
+* Rental occupancy rates
+* Revenue reports
+* Popular searches trend
+
+---
+
+### Phase 7 — Advanced / Optional
+
+* Third-party API integration (dealers, insurance)
+* Payments (Stripe / PayPal / local)
+* Multi-language & multi-currency
+* Mobile apps (React Native / Flutter)
+* Chatbot support, ML recommendations
+* Real-time support chat
+* Loyalty/rewards program
+
+---
+
+## 5. Roles & Permissions
+
+**Required**
+
+* Super Admin: full control (users, roles, listings, fees, payments, analytics, content moderation)
+* Admin/Moderator: moderate listings, categories, suspend users, complaints, limited reports
+* Seller/Owner/Landlord: create/edit listings, availability, inquiries, accept/reject offers, track transactions
+* Buyer: browse listings, place orders/offers, chat, make payment, leave reviews
+* Renter: search rentals, reserve/book, pay deposits, manage timelines, leave reviews
+
+
+* Agent/Broker: manage listings, inquiries, transactions
+* Support Staff: manage users, listings, inquiries, transactions
+* Finance/Accountant: manage payments, listings, inquiries, transactions
+* Content Manager: manage listings, inquiries, transactions
+
+> Buyer + Renter can be merged as **Customer role** with context-specific permissions
+
+---
+
+## 6. Backend Rules & API Standards
+
+* Response format: `{ "statusCode": <code>, "statusMessage": "<message>", "data": {} }`
+* Centralized constants for status codes & messages
+* Validate all inputs in backend using annotations (`@Valid`, `@NotNull`, `@Pattern`)
+* Full error handling with **global exception handler** returning standard API response
+* Use DTOs to separate entities from API responses
+* Service layer handles all business logic, controllers only call services
+* Use **RBAC** for routes and service methods
+
+---
+
+## 7. Frontend & UI/UX
+
+* Responsive design, modern look, visually appealing graphics/icons/images
+* Landing page: search bar, featured categories, banners, top listings
+* Home page: mix of Sell & Rent listings
+* Listing page: search/filter/sort, gallery, inquiry/contact
+* Profile page: user dashboard with listings/bookings
+* Admin dashboard: listing approvals, reports, analytics
+* Forms must be validated in frontend and backend
+* Buttons, navigation, cards, banners: clear design and UX best practices
+
+---
+
+## 8. Implementation Priority
+
+1. P1: Auth + Sell + Rent + Search (MVP)
+2. P2: Messaging + Notifications
+3. P3: Admin operations
+4. P4: Monetization
+5. P5: Analytics & Reports
+
+---
+
+## 9. AI Instructions
+
+1. Generate **backend first** with Spring Boot: constants, DTOs, entities, repositories, services, controllers, security
+2. Implement **JWT authentication + role management**
+3. Implement **Sell & Rent listings CRUD + search/filter + booking workflow**
+4. Implement **Admin operations**: approve/reject listings, user management, reports
+5. Implement **Phase 2 enhancements**: wishlist, media uploads, messaging, notifications
+6. Generate **frontend React project**: landing, home, listings, profile, admin dashboard
+7. Connect React with backend using Axios
+8. Implement **role-based routing and guards**
+9. Add **UI/UX enhancements** for graphics, banners, car cards, forms, dashboards
+10. Implement **reviews, verified badge, analytics, monetization**
+11. At every step: **validate inputs, handle errors, use API response wrapper, centralized constants**
+12. Generate **clean, modular, production-ready code** with comments for all modules
+
+> The AI must produce a **complete project in one go**, fully runnable, with both frontend and backend, respecting all roles, features, API standards, validations, and UX guidelines.
