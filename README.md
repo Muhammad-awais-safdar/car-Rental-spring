@@ -1,262 +1,342 @@
-# Car Marketplace + Rental Platform
+# Car Rental Marketplace - Spring Boot & React
 
-Enterprise-grade car marketplace and rental platform built with Spring Boot and React.
+A full-stack car rental and marketplace platform built with **Spring Boot** (backend) and **React** (frontend). This application provides a comprehensive solution for vehicle rentals, sales, and marketplace management with advanced features including real-time messaging, booking management, payment processing, and administrative controls.
 
 ## 🚀 Features
 
-### Core Functionality
-- ✅ **Buy/Sell Cars** - Full listing management with CRUD operations
-- ✅ **Rent Cars** - Rental listings with smart pricing (daily/weekly/monthly)
-- ✅ **Booking System** - Date-based bookings with conflict detection
-- ✅ **User Management** - JWT authentication, profile management
-- ✅ **Admin Dashboard** - Listing moderation and approval workflow
-- ✅ **File Upload** - Image upload for listings
-- ✅ **Advanced Search** - Filter by make, model, price, year, location
+### Core Features
 
-### Technical Highlights
-- **Modular Architecture** - Clean separation of concerns
-- **API Standards** - Centralized response format and constants
-- **Security** - JWT authentication, RBAC, BCrypt password hashing
-- **Database** - Flyway migrations for version control
-- **Responsive UI** - Professional design with Tailwind CSS
+- **User Authentication & Authorization** - JWT-based secure authentication with role-based access control (Admin, Seller, Buyer, Customer, Driver)
+- **Vehicle Listings Management** - Create, edit, and manage vehicle listings for both rental and sale
+- **Advanced Search & Filtering** - Search vehicles by make, model, price, location, and more
+- **Booking System** - Complete booking workflow with availability calendar and price calculation
+- **Real-time Messaging** - In-app messaging between buyers and sellers
+- **Reviews & Ratings** - User review system with rating statistics
+- **Wishlist** - Save favorite vehicles for later viewing
+- **Notifications** - Real-time notifications for bookings, messages, and updates
 
-## 📋 Tech Stack
+### Advanced Features
+
+- **Admin Dashboard** - Comprehensive admin panel with analytics and user management
+- **User Management** - Block/unblock users, manage roles, view user statistics
+- **Category Management** - Manage vehicle makes and models
+- **Activity Logs** - Track all user actions and system events
+- **Seller Verification** - Verification system for trusted sellers
+- **Audit Trail** - Complete audit trail for entity changes
+- **Driver Management** - Assign drivers to bookings with location tracking
+- **Subscription Plans** - Tiered subscription system for sellers
+- **Payment Processing** - Integrated payment system with transaction history
+- **Coupon System** - Create and manage discount coupons
+- **Featured Listings** - Boost listings with featured placement
+- **Promotion Banners** - Manage promotional banners with scheduling
+- **SEO Optimization** - Meta tags, social sharing, and sitemap support
+- **Google Analytics** - Integrated analytics tracking
+
+## 🛠️ Technology Stack
 
 ### Backend
-- **Framework**: Spring Boot 3.x
-- **Language**: Java 17
-- **Database**: MySQL 8.0
-- **ORM**: Spring Data JPA
-- **Migration**: Flyway
-- **Security**: Spring Security + JWT
-- **Build**: Maven
+
+- **Java 21**
+- **Spring Boot 3.2.1**
+- **Spring Security** - JWT authentication
+- **Spring Data JPA** - Database ORM
+- **Flyway** - Database migration management
+- **MySQL 8.0** - Primary database
+- **Lombok** - Reduce boilerplate code
+- **Maven** - Dependency management
 
 ### Frontend
-- **Framework**: React 18
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Routing**: React Router v6
-- **HTTP Client**: Axios
-- **State**: React Context API
 
-## 🛠️ Setup Instructions
+- **React 18**
+- **Vite** - Build tool
+- **React Router** - Client-side routing
+- **Axios** - HTTP client
+- **Tailwind CSS** - Utility-first CSS framework
+- **React Helmet Async** - SEO meta tags
+- **Google Analytics** - User tracking
 
-### Prerequisites
-- Java 17+
-- Node.js 18+
-- MySQL 8.0+
-- Maven 3.6+
+## 📋 Prerequisites
 
-### Backend Setup
+- **Java 21** or higher
+- **Node.js 18** or higher
+- **MySQL 8.0** or higher
+- **Maven 3.8** or higher
+- **Git**
 
-1. **Clone the repository**
+## 🔧 Installation & Setup
+
+### 1. Clone the Repository
+
 ```bash
-git clone <repository-url>
-cd "car rental/backend"
+git clone git@github.com:Muhammad-awais-safdar/car-Rental-spring.git
+cd car-Rental-spring
 ```
 
-2. **Configure Database**
+### 2. Database Setup
 
-Create MySQL database:
-```sql
+```bash
+# Create MySQL database
+mysql -u root -p
 CREATE DATABASE car_marketplace;
+exit;
 ```
 
-Update `src/main/resources/application.properties`:
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/car_marketplace
-spring.datasource.username=root
-spring.datasource.password=your_password
-jwt.secret=your_secret_key_here
-```
+### 3. Backend Setup
 
-3. **Build and Run**
 ```bash
+cd backend
+
+# Update application.properties with your MySQL credentials
+# Edit: src/main/resources/application.properties
+# spring.datasource.username=your_username
+# spring.datasource.password=your_password
+
+# Run Flyway migrations
+mvn flyway:migrate
+
+# Build and run the backend
 mvn clean install
 mvn spring-boot:run
 ```
 
-Backend will start on `http://localhost:8080`
+The backend will start on `http://localhost:8080`
 
-### Frontend Setup
+### 4. Frontend Setup
 
-1. **Navigate to frontend**
 ```bash
-cd "car rental/frontend"
-```
+cd frontend
 
-2. **Install dependencies**
-```bash
+# Install dependencies
 npm install
-```
 
-3. **Configure Environment**
+# Create .env file
+cp .env.example .env
 
-Create `.env` file:
-```
-VITE_API_URL=http://localhost:8080/api
-```
+# Update .env with your configuration
+# VITE_API_URL=http://localhost:8080/api
+# VITE_SITE_URL=http://localhost:5173
+# VITE_GA_TRACKING_ID=your_ga_tracking_id
 
-4. **Run Development Server**
-```bash
+# Start development server
 npm run dev
 ```
 
-Frontend will start on `http://localhost:5173`
-
-5. **Build for Production**
-```bash
-npm run build
-```
-
-## 📚 API Documentation
-
-### Authentication
-```
-POST /api/auth/register - Register new user
-POST /api/auth/login    - Login user
-```
-
-### Listings
-```
-GET    /api/listings/search      - Search listings
-GET    /api/listings/{id}        - Get listing by ID
-POST   /api/listings             - Create listing (Auth)
-PUT    /api/listings/{id}        - Update listing (Auth)
-DELETE /api/listings/{id}        - Delete listing (Auth)
-GET    /api/listings/my          - Get user's listings (Auth)
-```
-
-### Rentals
-```
-GET  /api/rentals/{id}                    - Get rental by ID
-GET  /api/rentals/listing/{listingId}     - Get rental by listing
-POST /api/rentals                         - Create rental (Auth)
-PUT  /api/rentals/{id}                    - Update rental (Auth)
-POST /api/rentals/{id}/check-availability - Check availability
-```
-
-### Bookings
-```
-GET  /api/bookings/my              - Get user bookings (Auth)
-GET  /api/bookings/{id}            - Get booking by ID (Auth)
-POST /api/bookings                 - Create booking (Auth)
-PUT  /api/bookings/{id}/cancel     - Cancel booking (Auth)
-PUT  /api/bookings/{id}/confirm    - Confirm booking (Admin)
-```
-
-### User Profile
-```
-GET /api/users/me             - Get profile (Auth)
-PUT /api/users/me             - Update profile (Auth)
-PUT /api/users/me/password    - Change password (Auth)
-```
-
-### Admin
-```
-GET /api/admin/listings/pending       - Get pending listings (Admin)
-PUT /api/admin/listings/{id}/approve  - Approve listing (Admin)
-PUT /api/admin/listings/{id}/reject   - Reject listing (Admin)
-```
-
-### File Upload
-```
-POST   /api/files/upload          - Upload single file (Auth)
-POST   /api/files/upload-multiple - Upload multiple files (Auth)
-DELETE /api/files/{filename}      - Delete file (Auth)
-```
-
-## 🔐 Default Roles
-
-The system includes the following roles:
-- `SUPER_ADMIN` - Full system access
-- `ADMIN` - Moderation and management
-- `SELLER` - Can create sell listings
-- `BUYER` - Can browse and buy
-- `RENTER` - Can rent cars
-- `CUSTOMER` - Combined buyer and renter
+The frontend will start on `http://localhost:5173`
 
 ## 📁 Project Structure
 
-### Backend
 ```
-backend/src/main/java/com/marketplace/
-├── common/          # Shared utilities, constants, exceptions
-├── auth/            # Authentication & user management
-├── listing/         # Car listings (buy/sell)
-├── rental/          # Rental management
-└── admin/           # Admin operations
+car-Rental-spring/
+├── backend/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/marketplace/
+│   │   │   │   ├── admin/          # Admin management
+│   │   │   │   ├── auth/           # Authentication & authorization
+│   │   │   │   ├── booking/        # Booking management
+│   │   │   │   ├── category/       # Vehicle categories
+│   │   │   │   ├── common/         # Shared utilities
+│   │   │   │   ├── coupon/         # Coupon system
+│   │   │   │   ├── driver/         # Driver management
+│   │   │   │   ├── listing/        # Vehicle listings
+│   │   │   │   ├── messaging/      # Real-time messaging
+│   │   │   │   ├── notification/   # Notifications
+│   │   │   │   ├── payment/        # Payment processing
+│   │   │   │   ├── promotion/      # Promotion banners
+│   │   │   │   ├── rental/         # Rental management
+│   │   │   │   ├── review/         # Reviews & ratings
+│   │   │   │   ├── seller/         # Seller verification
+│   │   │   │   ├── subscription/   # Subscription plans
+│   │   │   │   └── wishlist/       # Wishlist feature
+│   │   │   └── resources/
+│   │   │       ├── db/migration/   # Flyway migrations
+│   │   │       └── application.properties
+│   │   └── test/
+│   └── pom.xml
+│
+└── frontend/
+    ├── src/
+    │   ├── features/
+    │   │   ├── admin/              # Admin pages
+    │   │   ├── auth/               # Auth pages
+    │   │   ├── bookings/           # Booking pages
+    │   │   ├── listings/           # Listing pages
+    │   │   ├── messaging/          # Messaging pages
+    │   │   ├── notifications/      # Notification components
+    │   │   ├── profile/            # User profile
+    │   │   ├── rentals/            # Rental pages
+    │   │   ├── reviews/            # Review components
+    │   │   ├── subscription/       # Subscription pages
+    │   │   └── wishlist/           # Wishlist pages
+    │   ├── shared/                 # Shared components
+    │   ├── utils/                  # Utility functions
+    │   ├── App.jsx
+    │   └── main.jsx
+    ├── public/
+    ├── package.json
+    └── vite.config.js
 ```
 
-### Frontend
-```
-frontend/src/
-├── core/api/        # API client
-├── features/
-│   ├── auth/        # Login, Register
-│   ├── listings/    # Listing pages
-│   ├── rentals/     # Rental pages
-│   ├── bookings/    # Booking management
-│   ├── profile/     # User profile
-│   └── admin/       # Admin dashboard
-└── shared/          # Reusable components
-```
+## 🔐 API Endpoints
 
-## 🎨 Design System
+### Authentication
 
-**Colors:**
-- Primary: Racing Red (#EF4444)
-- Secondary: Jet Black (#0B0F14)
-- Accent: Neon Yellow (#FACC15)
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `GET /api/auth/me` - Get current user
 
-**Components:**
-- Cards, buttons, inputs follow consistent styling
-- Responsive design for mobile/tablet/desktop
+### Listings
+
+- `GET /api/listings` - Get all listings
+- `GET /api/listings/{id}` - Get listing by ID
+- `POST /api/listings` - Create new listing
+- `PUT /api/listings/{id}` - Update listing
+- `DELETE /api/listings/{id}` - Delete listing
+- `GET /api/listings/search` - Search listings
+
+### Bookings
+
+- `POST /api/bookings` - Create booking
+- `GET /api/bookings/user` - Get user bookings
+- `GET /api/bookings/{id}` - Get booking details
+- `PUT /api/bookings/{id}/status` - Update booking status
+
+### Reviews
+
+- `POST /api/reviews` - Create review
+- `GET /api/reviews/listing/{id}` - Get listing reviews
+- `GET /api/reviews/statistics/{id}` - Get rating statistics
+
+### Messaging
+
+- `POST /api/messages` - Send message
+- `GET /api/messages/conversations` - Get conversations
+- `GET /api/messages/conversation/{id}` - Get conversation messages
+
+### Admin
+
+- `GET /api/admin/users` - Get all users
+- `PUT /api/admin/users/{id}/block` - Block user
+- `GET /api/admin/analytics` - Get analytics data
+- `GET /api/admin/activity-logs` - Get activity logs
+
+_For complete API documentation, see the API docs at `/api-docs` when running the backend._
+
+## 🗄️ Database Schema
+
+The application uses **24 Flyway migrations** to manage the database schema:
+
+1. Users and roles
+2. Vehicle listings
+3. Rentals and bookings
+4. Booking driver and location fields
+5. Drivers table
+6. Slug generation for listings
+7. Rename listings to vehicles
+8. Driver role
+9. Wishlist
+10. Reviews
+11. Notifications
+12. Messaging tables
+13. User blocking
+14. Makes and models
+15. Activity logs
+16. Seller verification and audit trails
+17. Subscriptions and payments
+18. Coupons
+19. Featured listings
+20. Promotion banners
+
+## 👥 Default Users
+
+After running the database seeder, the following test users are available:
+
+- **Admin**: admin@example.com / password
+- **Seller**: seller@example.com / password
+- **Buyer**: buyer@example.com / password
 
 ## 🧪 Testing
 
 ### Backend Tests
+
 ```bash
+cd backend
 mvn test
 ```
 
 ### Frontend Tests
+
 ```bash
+cd frontend
 npm test
 ```
 
-## 📦 Build Status
-
-- ✅ Backend: 40 Java files compiled
-- ✅ Frontend: 119 modules (327KB gzipped)
-
-## 🚀 Deployment
+## 📦 Build for Production
 
 ### Backend
+
 ```bash
+cd backend
 mvn clean package
 java -jar target/car-marketplace-1.0-SNAPSHOT.jar
 ```
 
 ### Frontend
+
 ```bash
+cd frontend
 npm run build
-# Deploy dist/ folder to your hosting service
+# Deploy the 'dist' folder to your hosting service
 ```
+
+## 🚀 Deployment
+
+### Backend Deployment
+
+- Deploy the JAR file to any Java hosting service (AWS, Heroku, DigitalOcean, etc.)
+- Ensure MySQL database is accessible
+- Set environment variables for database credentials
+
+### Frontend Deployment
+
+- Build the frontend: `npm run build`
+- Deploy the `dist` folder to:
+  - Vercel
+  - Netlify
+  - AWS S3 + CloudFront
+  - Any static hosting service
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📝 License
 
-MIT License
+This project is licensed under the MIT License.
 
-## 👥 Contributing
+## 👨‍💻 Author
 
-Contributions are welcome! Please follow the existing code style and conventions.
+**Muhammad Awais Safdar**
 
-## 📧 Support
+- GitHub: [@Muhammad-awais-safdar](https://github.com/Muhammad-awais-safdar)
 
-For issues and questions, please open an issue on GitHub.
+## 🙏 Acknowledgments
+
+- Spring Boot team for the excellent framework
+- React team for the powerful UI library
+- All contributors and supporters of this project
+
+## 📞 Support
+
+For support, email your-email@example.com or open an issue in the GitHub repository.
 
 ---
 
-**Built with ❤️ using Spring Boot and React**
-# car-Rental-spring
+**Note**: This is a comprehensive car rental marketplace platform with enterprise-level features. Make sure to configure all environment variables and security settings properly before deploying to production.
