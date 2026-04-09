@@ -260,3 +260,4 @@ prompt.txt
 /tmp/
 *.backup
 start.sh
+backend/target/*
