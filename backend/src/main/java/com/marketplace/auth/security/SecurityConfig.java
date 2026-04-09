@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/rentals/*/check-availability").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bookings/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/bookings").permitAll()
+                        .requestMatchers("/api/rides/**").authenticated()
                         .requestMatchers("/api/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions

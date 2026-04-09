@@ -1,5 +1,7 @@
 package com.marketplace.common.constants;
 
+import java.math.BigDecimal;
+
 /**
  * Centralized constants for the application
  */
@@ -51,6 +53,9 @@ public class Constants {
     public static final String ROLE_BUYER = "BUYER";
     public static final String ROLE_RENTER = "RENTER";
     public static final String ROLE_CUSTOMER = "CUSTOMER";
+    public static final String ROLE_DRIVER = "DRIVER";
+    public static final String ROLE_PASSENGER = "PASSENGER";
+    public static final String ROLE_MANAGER = "MANAGER";
 
     // Listing Status
     public static final String LISTING_STATUS_PENDING = "PENDING";
@@ -66,6 +71,48 @@ public class Constants {
     public static final String BOOKING_STATUS_CONFIRMED = "CONFIRMED";
     public static final String BOOKING_STATUS_CANCELLED = "CANCELLED";
     public static final String BOOKING_STATUS_COMPLETED = "COMPLETED";
+
+    // ─── RIDE STATUS ─────────────────────────────────────────────────────────
+    public static final String RIDE_STATUS_SEARCHING = "SEARCHING";
+    public static final String RIDE_STATUS_BIDDING = "BIDDING";
+    public static final String RIDE_STATUS_ACCEPTED = "ACCEPTED";
+    public static final String RIDE_STATUS_DRIVER_ARRIVING = "DRIVER_ARRIVING";
+    public static final String RIDE_STATUS_IN_PROGRESS = "IN_PROGRESS";
+    public static final String RIDE_STATUS_COMPLETED = "COMPLETED";
+    public static final String RIDE_STATUS_CANCELLED = "CANCELLED";
+
+    // Ride Messages
+    public static final String MSG_RIDE_CREATED = "Ride request created successfully";
+    public static final String MSG_RIDE_STARTED = "Ride has started";
+    public static final String MSG_RIDE_COMPLETED = "Ride completed successfully";
+    public static final String MSG_RIDE_CANCELLED = "Ride cancelled";
+
+    // ─── BID STATUS ──────────────────────────────────────────────────────────
+    public static final String BID_STATUS_PENDING = "PENDING";
+    public static final String BID_STATUS_ACCEPTED = "ACCEPTED";
+    public static final String BID_STATUS_REJECTED = "REJECTED";
+    public static final String BID_STATUS_WITHDRAWN = "WITHDRAWN";
+    public static final String BID_STATUS_EXPIRED = "EXPIRED";
+
+    // Bid Messages
+    public static final String MSG_BID_PLACED = "Bid placed successfully";
+    public static final String MSG_BID_ACCEPTED = "Bid accepted successfully";
+    public static final String MSG_BID_REJECTED = "Bid rejected";
+    public static final String MSG_BID_WITHDRAWN = "Bid withdrawn successfully";
+
+    // ─── COMMISSION ──────────────────────────────────────────────────────────
+    public static final BigDecimal DEFAULT_COMMISSION_RATE = new BigDecimal("15.00");
+    public static final String COMMISSION_LEVEL_DEFAULT = "DEFAULT";
+    public static final String COMMISSION_LEVEL_COUNTRY = "COUNTRY";
+    public static final String COMMISSION_LEVEL_CITY = "CITY";
+    public static final String COMMISSION_LEVEL_ZONE = "ZONE";
+
+    // ─── WALLET ──────────────────────────────────────────────────────────────
+    public static final String WALLET_TX_EARNING = "EARNING";
+    public static final String WALLET_TX_COMMISSION = "COMMISSION";
+    public static final String WALLET_TX_WITHDRAWAL = "WITHDRAWAL";
+    public static final String WALLET_TX_TOP_UP = "TOP_UP";
+    public static final String WALLET_TX_REFUND = "REFUND";
 
     // JWT
     public static final String JWT_HEADER = "Authorization";

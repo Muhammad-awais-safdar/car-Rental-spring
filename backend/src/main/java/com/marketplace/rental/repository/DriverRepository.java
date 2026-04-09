@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, Long> {
@@ -14,4 +15,9 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     List<Driver> findByIsAvailableTrueOrderByRatingDesc();
 
     boolean existsByLicenseNumber(String licenseNumber);
+
+    // Find driver profile by their user account ID
+    Optional<Driver> findByUserId(Long userId);
+
+    boolean existsByUserId(Long userId);
 }

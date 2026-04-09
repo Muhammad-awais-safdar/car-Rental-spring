@@ -2,6 +2,7 @@
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/subscription/entity/Subscription.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/notification/service/NotificationService.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/rental/controller/DriverController.java
+/home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/ride/repository/RideRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/subscription/service/SubscriptionService.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/admin/entity/ActivityLog.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/category/repository/ModelRepository.java
@@ -11,6 +12,7 @@
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/common/exception/UnauthorizedException.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/messaging/repository/MessageRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/admin/entity/AuditTrail.java
+/home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/ride/controller/RideController.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/rental/repository/RentalRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/analytics/dto/AnalyticsDTO.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/admin/service/AuditTrailService.java
@@ -28,6 +30,7 @@
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/common/seeder/ReviewSeeder.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/auth/repository/RoleRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/category/service/CategoryService.java
+/home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/ride/repository/RideBidRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/category/entity/Model.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/notification/entity/Notification.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/auth/dto/AuthDTO.java
@@ -44,6 +47,7 @@
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/rental/repository/DriverRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/common/constants/Constants.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/verification/dto/VerificationDTO.java
+/home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/ride/entity/Ride.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/wishlist/repository/WishlistRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/coupon/controller/CouponController.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/verification/service/VerificationService.java
@@ -75,6 +79,7 @@
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/common/payload/ApiResponse.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/category/repository/MakeRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/auth/security/JwtAuthenticationFilter.java
+/home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/ride/controller/BidController.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/subscription/dto/SubscriptionDTO.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/notification/repository/NotificationRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/promotion/dto/PromotionBannerDTO.java
@@ -85,11 +90,13 @@
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/common/util/SlugUtil.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/rental/controller/BookingController.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/payment/service/PaymentService.java
+/home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/ride/service/BidService.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/common/exception/ResourceNotFoundException.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/messaging/entity/Conversation.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/seller/repository/SellerVerificationRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/rental/service/RentalService.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/listing/entity/ListingImage.java
+/home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/ride/dto/RideDTO.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/admin/service/AdminUserService.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/analytics/repository/AnalyticsEventRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/review/controller/ReviewController.java
@@ -121,6 +128,7 @@
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/coupon/dto/CouponDTO.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/common/seeder/BookingSeeder.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/admin/controller/AuditTrailController.java
+/home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/ride/entity/RideBid.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/payment/entity/Payment.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/seller/dto/SellerVerificationDTO.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/admin/service/AdminAnalyticsService.java
@@ -136,6 +144,7 @@
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/subscription/controller/SubscriptionController.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/auth/controller/AuthController.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/auth/security/JwtTokenProvider.java
+/home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/ride/service/RideService.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/common/exception/GlobalExceptionHandler.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/admin/repository/ActivityLogRepository.java
 /home/awais/Laravel/car rental/backend/src/main/java/com/marketplace/auth/dto/UserDTO.java

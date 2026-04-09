@@ -51,6 +51,11 @@ import MessagesPage from "./features/messaging/pages/MessagesPage";
 import SubscriptionPlansPage from "./features/subscription/pages/SubscriptionPlansPage";
 import PaymentPage from "./features/subscription/pages/PaymentPage";
 
+// Ride Pages (RideFlex)
+import RequestRidePage from "./features/rides/pages/RequestRidePage";
+import RideDetailPage from "./features/rides/pages/RideDetailPage";
+import MyRidesPage from "./features/rides/pages/MyRidesPage";
+
 import "./index.css";
 
 // Protected Route Component
@@ -265,6 +270,38 @@ function App() {
               <ProtectedRoute>
                 <AppLayout>
                   <PaymentPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Ride Routes (RideFlex) */}
+          <Route
+            path="/rides/request"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <RequestRidePage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/rides/my"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <MyRidesPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/rides/:id"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <RideDetailPage />
                 </AppLayout>
               </ProtectedRoute>
             }
