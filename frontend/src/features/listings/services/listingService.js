@@ -33,7 +33,7 @@ export const listingService = {
     },
 
     // Get user's listings
-    getMyListings: async () => {
+    getUserListings: async () => {
         return await api.get('/listings/my');
     },
 };

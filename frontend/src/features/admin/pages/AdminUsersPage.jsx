@@ -22,8 +22,8 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     try {
       const response = await adminUserService.getAllUsers(page, 20);
-      setUsers(response.data.content);
-      setTotalPages(response.data.totalPages);
+      setUsers(response.data.data.content);
+      setTotalPages(response.data.data.totalPages);
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
@@ -34,7 +34,7 @@ export default function AdminUsersPage() {
   const fetchStats = async () => {
     try {
       const response = await adminUserService.getUserStatistics();
-      setStats(response.data);
+      setStats(response.data.data);
     } catch (error) {
       console.error("Error fetching stats:", error);
     }
@@ -147,7 +147,7 @@ export default function AdminUsersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {users.map((user) => (
+                {users?.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center">

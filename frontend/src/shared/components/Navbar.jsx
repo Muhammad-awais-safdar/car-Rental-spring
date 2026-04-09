@@ -117,8 +117,11 @@ export default function Navbar() {
                           </svg>
                           My Profile
                         </DropdownLink>
-                        {user?.roles?.includes("ADMIN") && (
-                          <DropdownLink to="/admin">
+                        {user?.roles?.some(
+                          (role) =>
+                            role.name === "ADMIN" || role.name === "SUPER_ADMIN"
+                        ) && (
+                          <DropdownLink to="/admin/dashboard">
                             <svg
                               className="w-5 h-5"
                               fill="none"

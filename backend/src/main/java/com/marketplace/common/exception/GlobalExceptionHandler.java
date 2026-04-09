@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * Global exception handler
@@ -64,6 +66,20 @@ public class GlobalExceptionHandler {
                         .data(errors)
                         .build(),
                 HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAccessDeniedException(AccessDeniedException ex) {
+        return new ResponseEntity<>(
+                ApiResponse.error(Constants.STATUS_FORBIDDEN, "Access denied"),
+                HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAuthenticationException(AuthenticationException ex) {
+        return new ResponseEntity<>(
+                ApiResponse.error(Constants.STATUS_UNAUTHORIZED, "Authentication failed"),
+                HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)

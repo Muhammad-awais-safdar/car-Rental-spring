@@ -45,5 +45,10 @@ public interface ListingRepository extends JpaRepository<Listing, Long> {
                         Pageable pageable);
 
         // Analytics queries
-        long countByCreatedAtAfter(LocalDateTime date);
+        Long countByCreatedAtAfter(LocalDateTime date);
+
+        // Price estimation queries
+        List<Listing> findByMakeAndModelAndYearBetween(String make, String model, Integer yearStart, Integer yearEnd);
+
+        List<Listing> findByMakeAndModelAndYear(String make, String model, Integer year);
 }

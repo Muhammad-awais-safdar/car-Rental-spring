@@ -1,7 +1,7 @@
 package com.marketplace.admin.controller;
 
 import com.marketplace.admin.dto.AnalyticsDTO;
-import com.marketplace.admin.service.AnalyticsService;
+import com.marketplace.admin.service.AdminAnalyticsService;
 import com.marketplace.common.constants.Constants;
 import com.marketplace.common.payload.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin/analytics")
 @CrossOrigin(origins = "*")
 @PreAuthorize("hasRole('ADMIN')")
-public class AnalyticsController {
+public class AdminAnalyticsController {
 
     @Autowired
-    private AnalyticsService analyticsService;
+    private AdminAnalyticsService analyticsService;
 
     @GetMapping("/overview")
     public ResponseEntity<ApiResponse<AnalyticsDTO.OverviewStats>> getOverviewStats() {

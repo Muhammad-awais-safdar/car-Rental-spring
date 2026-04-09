@@ -24,6 +24,28 @@ import java.util.*;
 public class DatabaseSeeder implements CommandLineRunner {
 
     @Autowired
+    private CategorySeeder categorySeeder;
+
+    @Autowired
+    private UserSeeder userSeeder;
+
+    @Autowired
+    private SlugSeeder slugSeeder;
+
+    @Autowired
+    private BookingSeeder bookingSeeder;
+
+    @Autowired
+    private ReviewSeeder reviewSeeder;
+
+    @Autowired
+    private NotificationSeeder notificationSeeder;
+
+    @Autowired
+    private AnalyticsSeeder analyticsSeeder;
+
+    // Legacy dependencies
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -45,21 +67,30 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("🌱 Checking database for seed data...");
+        System.out.println("🌱 Starting comprehensive database seeding...");
 
-        // Seed users if they don't exist
+        // Execute seeders in proper order
+        categorySeeder.seed(); // 1. Categories (makes/models)
+
+        // Legacy seeding for backward compatibility
         if (userRepository.count() == 0) {
             seedUsers();
-            // Seed drivers independently (check by email)
             seedDrivers();
         }
 
-        // Seed listings if they don't exist
+        userSeeder.seed(); // 2. Users (all roles)
+
         if (listingRepository.count() == 0) {
             seedListings();
         }
 
-        System.out.println("✅ Database seeding check completed!");
+        // slugSeeder.ensureSlugs(); // 3. Ensure slugs (SlugSeeder runs separately)
+        bookingSeeder.seed(); // 4. Bookings
+        reviewSeeder.seed(); // 5. Reviews
+        notificationSeeder.seed(); // 6. Notifications
+        analyticsSeeder.seed(); // 7. Analytics events
+
+        System.out.println("✅ Database seeding completed successfully!");
     }
 
     private void seedUsers() {

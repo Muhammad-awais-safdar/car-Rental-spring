@@ -45,6 +45,17 @@ export default function ProfilePage() {
     };
 
     if (loading) return <LoadingSpinner />;
+    if (!profile) return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="text-center">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Profile Not Found</h2>
+                <p className="text-gray-600 mb-4">Please log in to view your profile.</p>
+                <button onClick={() => window.location.href = '/login'} className="btn-primary">
+                    Go to Login
+                </button>
+            </div>
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -57,9 +68,9 @@ export default function ProfilePage() {
                             <div className="flex justify-between items-start mb-6">
                                 <div>
                                     <h2 className="text-2xl font-semibold text-gray-900">
-                                        {profile.firstName} {profile.lastName}
+                                        {profile?.firstName} {profile?.lastName}
                                     </h2>
-                                    <p className="text-gray-600">{profile.email}</p>
+                                    <p className="text-gray-600">{profile?.email}</p>
                                 </div>
                                 <button onClick={() => setEditing(true)} className="btn-primary">
                                     Edit Profile

@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class AnalyticsService {
+public class AdminAnalyticsService {
 
     @Autowired
     private UserRepository userRepository;

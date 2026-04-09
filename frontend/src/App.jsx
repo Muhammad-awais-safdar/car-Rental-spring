@@ -33,11 +33,13 @@ import ProfilePage from "./features/profile/pages/ProfilePage";
 import ChangePasswordPage from "./features/profile/pages/ChangePasswordPage";
 
 // Admin Pages
+import AdminLayout from "./features/admin/components/AdminLayout";
 import AdminDashboardPage from "./features/admin/pages/AdminDashboardPage";
 import AdminUsersPage from "./features/admin/pages/AdminUsersPage";
 import AdminReportsPage from "./features/admin/pages/AdminReportsPage";
 import AdminCategoriesPage from "./features/admin/pages/AdminCategoriesPage";
 import AdminActivityLogsPage from "./features/admin/pages/AdminActivityLogsPage";
+import AdminPlaceholderPage from "./features/admin/pages/AdminPlaceholderPage";
 
 // Wishlist Pages
 import WishlistPage from "./features/wishlist/pages/WishlistPage";
@@ -198,56 +200,29 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Admin Routes with AdminLayout */}
           <Route
-            path="/admin/dashboard"
+            path="/admin"
             element={
               <ProtectedRoute>
-                <AppLayout>
-                  <AdminDashboardPage />
-                </AppLayout>
+                <AdminLayout />
               </ProtectedRoute>
             }
-          />
-          <Route
-            path="/admin/users"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <AdminUsersPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/reports"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <AdminReportsPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/categories"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <AdminCategoriesPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/activity-logs"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <AdminActivityLogsPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
+          >
+            <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="users/:id" element={<AdminUsersPage />} />
+            <Route path="reports" element={<AdminReportsPage />} />
+            <Route path="categories" element={<AdminCategoriesPage />} />
+            <Route path="activity-logs" element={<AdminActivityLogsPage />} />
+
+            {/* Placeholder Routes */}
+            <Route path="listings" element={<AdminPlaceholderPage />} />
+            <Route path="bookings" element={<AdminPlaceholderPage />} />
+            <Route path="reviews" element={<AdminPlaceholderPage />} />
+            <Route path="analytics" element={<AdminPlaceholderPage />} />
+            <Route path="settings" element={<AdminPlaceholderPage />} />
+          </Route>
 
           {/* Wishlist Route */}
           <Route

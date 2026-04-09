@@ -46,10 +46,6 @@ public class User {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
-    @Column(name = "is_verified", nullable = false)
-    @Builder.Default
-    private Boolean isVerified = false;
-
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private Boolean isActive = true;
@@ -67,6 +63,15 @@ public class User {
 
     @Column(name = "blocked_reason", columnDefinition = "TEXT")
     private String blockedReason;
+
+    @Column(name = "is_verified")
+    private Boolean isVerified;
+
+    @Column(name = "verification_level", length = 50)
+    private String verificationLevel;
+
+    @Column(name = "verified_at")
+    private LocalDateTime verifiedAt;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -5,7 +5,8 @@
 # ===========================
 # Java / Maven (Backend)
 # ===========================
-backend/target/
+backend/target/*
+backend/target
 backend/*.jar
 backend/*.war
 backend/*.ear
@@ -231,6 +232,7 @@ htmlcov/
 # ===========================
 docs/_build/
 site/
+./prompt.txt
 
 # ===========================
 # Misc
@@ -249,7 +251,7 @@ site/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-
+./start.sh
 # ===========================
 # Project Specific
 # ===========================
@@ -257,3 +259,4 @@ site/
 prompt.txt
 /tmp/
 *.backup
+start.sh
