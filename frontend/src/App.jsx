@@ -55,6 +55,7 @@ import PaymentPage from "./features/subscription/pages/PaymentPage";
 import RequestRidePage from "./features/rides/pages/RequestRidePage";
 import RideDetailPage from "./features/rides/pages/RideDetailPage";
 import MyRidesPage from "./features/rides/pages/MyRidesPage";
+import LiveRidePage from "./features/rides/pages/LiveRidePage";
 
 import "./index.css";
 
@@ -303,6 +304,15 @@ function App() {
                 <AppLayout>
                   <RideDetailPage />
                 </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/rides/:id/live"
+            element={
+              <ProtectedRoute>
+                <LiveRidePage />
               </ProtectedRoute>
             }
           />

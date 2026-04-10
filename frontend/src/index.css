@@ -1,91 +1,116 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
-/* ===== CSS Variables ===== */
+/* ===== Perfect Clone Design System (Yango/InDrive inspired) ===== */
 :root {
-  /* Primary Colors - Racing Theme */
-  --primary-red: #DC2626;
-  --primary-red-dark: #B91C1C;
-  --primary-red-light: #EF4444;
-  --primary-red-lighter: #FCA5A5;
+  /* Primary Palette */
+  --brand-yellow: #facc15;     /* Yellow-400 */
+  --brand-yellow-dark: #eab308;
+  --brand-black: #020617;      /* Slate-950 */
+  --brand-slate: #1e293b;      /* Slate-800 */
+  
+  /* Status Colors */
+  --status-green: #22c55e;
+  --status-red: #ef4444;
+  --status-blue: #3b82f6;
 
-  /* Secondary Colors */
-  --secondary-dark: #0B0F14;
-  --secondary-gray: #1F2937;
-  --secondary-gray-light: #374151;
-
-  /* Accent Colors */
-  --accent-yellow: #FBBF24;
-  --accent-blue: #3B82F6;
-  --accent-green: #10B981;
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-bg-dark: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.2);
 }
 
-/* ===== Custom Animations ===== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+body {
+  font-family: 'Outfit', sans-serif;
+  @apply bg-slate-950 text-slate-100;
+  overflow-x: hidden;
 }
 
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
+/* ===== Custom Utilities ===== */
 
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.glass-panel {
+  @apply backdrop-blur-xl border border-white/10 shadow-2xl;
+  background: var(--glass-bg-dark);
 }
 
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.glass-panel-light {
+  @apply backdrop-blur-lg border border-white/20 shadow-xl;
+  background: var(--glass-bg);
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.6s ease-out;
+.yango-btn {
+  @apply bg-yellow-400 text-slate-950 font-black rounded-2xl px-6 py-4 
+         shadow-lg shadow-yellow-400/20 hover:bg-yellow-300 active:scale-95 transition-all;
 }
 
-.animate-slideInLeft {
-  animation: slideInLeft 0.6s ease-out;
+.yango-input {
+  @apply bg-slate-900/50 border border-slate-700 rounded-2xl px-4 py-4 text-white
+         focus:ring-2 focus:ring-yellow-400 focus:border-transparent outline-none transition-all;
 }
 
-.animate-slideInRight {
-  animation: slideInRight 0.6s ease-out;
+/* ===== Map Immersion ===== */
+.map-canvas {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
 }
 
-/* ===== Custom Gradient Classes ===== */
-.gradient-text {
-  background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-yellow) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Leaflet Customizations */
+.leaflet-container {
+  background: #020617 !important; /* Match deep slate */
 }
 
-.hero-gradient {
-  background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-gray) 100%);
-  position: relative;
-  overflow: hidden;
+/* Hide annoying leaflet attribution for pure clone feel */
+.leaflet-control-attribution {
+  display: none !important;
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+/* Custom Marker Pulsing for Live Location */
+.marker-pulse {
+  @apply bg-yellow-400 rounded-full w-4 h-4;
+  box-shadow: 0 0 0 rgba(250, 204, 21, 0.4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(250, 204, 21, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
+}
+
+/* ===== Animations ===== */
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Floating Elements */
+.floating-card {
+  @apply fixed z-50 pointer-events-auto;
+}
+
+.bottom-sheet {
+  @apply fixed bottom-0 left-0 right-0 p-6 z-[100] animate-slideUp;
+  max-height: 85vh;
+  border-radius: 32px 32px 0 0;
+}
+
+.top-header {
+  @apply fixed top-6 left-6 right-6 z-[100] animate-slideDown;
 }

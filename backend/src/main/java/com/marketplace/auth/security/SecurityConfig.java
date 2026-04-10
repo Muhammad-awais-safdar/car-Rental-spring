@@ -62,6 +62,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws/**").permitAll()           // WebSocket handshake (SockJS)
+                        .requestMatchers(HttpMethod.GET, "/api/tracking/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/tracking/**").authenticated()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/listings/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/rentals/**").permitAll()

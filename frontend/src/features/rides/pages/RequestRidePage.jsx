@@ -1,30 +1,91 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { rideService } from '../services/rideService';
+import { useAuth } from '../../auth/context/AuthContext';
+import LiveTrackingMap from '../../tracking/components/LiveTrackingMap';
 
-const VEHICLE_TYPES = ['ANY', 'CAR', 'BIKE', 'VAN'];
+const VEHICLE_TYPES = [
+    { value: 'ANY',  label: 'Any Vehicle',  icon: '🚗', desc: 'All available' },
+    { value: 'CAR',  label: 'Car',           icon: '🚙', desc: 'Sedan / Hatchback' },
+    { value: 'BIKE', label: 'Bike',          icon: '🏍️', desc: 'Motorbike / Rickshaw' },
+    { value: 'VAN',  label: 'Van / SUV',     icon: '🚐', desc: 'For groups' },
+];
+
+async function geocode(address) {
+    if (!address) return null;
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+        const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+        const data = await res.json();
+        if (!data.length) return null;
+        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    } catch {
+        return null;
+    }
+}
 
 export default function RequestRidePage() {
     const navigate = useNavigate();
+    const { token } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [formData, setFormData] = useState({
-        pickupAddress: '',
-        pickupLat: '',
-        pickupLng: '',
-        dropoffAddress: '',
-        dropoffLat: '',
-        dropoffLng: '',
-        offeredPrice: '',
-        vehicleType: 'ANY',
-        notes: '',
-        estimatedDistanceKm: '',
-        estimatedDurationMin: '',
-    });
+    const [geoLoading, setGeoLoading] = useState(false);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+    const [pickup,  setPickup]  = useState('');
+    const [dropoff, setDropoff] = useState('');
+    const [fare,    setFare]    = useState('');
+    const [vehicle, setVehicle] = useState('ANY');
+    const [notes,   setNotes]   = useState('');
+
+    const [coords, setCoords] = useState({ pickup: null, dropoff: null });
+    const [nearbyDrivers, setNearbyDrivers] = useState([]);
+
+    // Get current location on mount
+    useEffect(() => {
+        if (!navigator.geolocation) return;
+        setGeoLoading(true);
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                setCoords(prev => ({ ...prev, pickup: [latitude, longitude] }));
+                try {
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+                        { headers: { 'Accept-Language': 'en' } }
+                    );
+                    const d = await res.json();
+                    if (d.display_name) setPickup(d.display_name.split(',').slice(0, 3).join(',').trim());
+                } catch {
+                    setPickup(`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+                }
+                setGeoLoading(false);
+                fetchNearbyDrivers(latitude, longitude);
+            },
+            () => setGeoLoading(false),
+            { enableHighAccuracy: true, timeout: 6000 }
+        );
+    }, []);
+
+    const fetchNearbyDrivers = async (lat, lng) => {
+        try {
+            // This endpoint should be in tracking service/controller
+            const res = await fetch(`/api/tracking/drivers/online?lat=${lat}&lng=${lng}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.data) setNearbyDrivers(data.data);
+        } catch (err) {
+            console.error('Failed to fetch nearby drivers:', err);
+        }
+    };
+
+    const handlePreviewRoute = async () => {
+        if (!pickup || !dropoff) return;
+        setLoading(true);
+        const [p, d] = await Promise.all([geocode(pickup), geocode(dropoff)]);
+        if (p) setCoords(prev => ({ ...prev, pickup: [p.lat, p.lng] }));
+        if (d) setCoords(prev => ({ ...prev, dropoff: [d.lat, d.lng] }));
+        setLoading(false);
     };
 
     const handleSubmit = async (e) => {
@@ -33,271 +94,147 @@ export default function RequestRidePage() {
         setLoading(true);
 
         try {
+            const [p, d] = await Promise.all([geocode(pickup), geocode(dropoff)]);
+            if (!p || !d) {
+                setError('Could not locate one or both addresses. Please be more specific.');
+                setLoading(false);
+                return;
+            }
+
             const payload = {
-                ...formData,
-                pickupLat: formData.pickupLat ? parseFloat(formData.pickupLat) : null,
-                pickupLng: formData.pickupLng ? parseFloat(formData.pickupLng) : null,
-                dropoffLat: formData.dropoffLat ? parseFloat(formData.dropoffLat) : null,
-                dropoffLng: formData.dropoffLng ? parseFloat(formData.dropoffLng) : null,
-                offeredPrice: formData.offeredPrice ? parseFloat(formData.offeredPrice) : null,
-                estimatedDistanceKm: formData.estimatedDistanceKm ? parseFloat(formData.estimatedDistanceKm) : null,
-                estimatedDurationMin: formData.estimatedDurationMin ? parseInt(formData.estimatedDurationMin) : null,
+                pickupAddress: pickup,
+                pickupLat: p.lat,
+                pickupLng: p.lng,
+                dropoffAddress: dropoff,
+                dropoffLat: d.lat,
+                dropoffLng: d.lng,
+                offeredPrice: fare ? parseFloat(fare) : null,
+                vehicleType: vehicle,
+                notes: notes.trim() || null
             };
 
             const response = await rideService.createRide(payload);
             navigate(`/rides/${response.data.id}`);
         } catch (err) {
-            setError(err.response?.data?.statusMessage || 'Failed to create ride request');
+            setError(err.response?.data?.message || 'Failed to create ride request');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-            <div className="max-w-2xl mx-auto px-4 py-10">
-
-                {/* Header */}
-                <div className="mb-8">
-                    <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-1.5 mb-4">
-                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                        <span className="text-amber-400 text-sm font-medium">RideFlex</span>
-                    </div>
-                    <h1 className="text-4xl font-bold text-white mb-2">Request a Ride</h1>
-                    <p className="text-slate-400 text-lg">Get competitive bids from nearby drivers</p>
+        <div className="flex flex-col lg:flex-row h-[calc(100vh-64px)] overflow-hidden">
+            {/* Sidebar Form */}
+            <div className="w-full lg:w-96 bg-white shadow-xl z-10 overflow-y-auto p-6 flex flex-col">
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold text-slate-900 mb-1">Request a Ride</h1>
+                    <p className="text-slate-500 text-sm">Real-time driver bidding & tracking</p>
                 </div>
 
-                {/* Form Card */}
-                <div className="bg-slate-800/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pickup Location</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={pickup}
+                                onChange={(e) => setPickup(e.target.value)}
+                                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all outline-none"
+                                placeholder="Enter pickup address"
+                                required
+                            />
+                            <span className="absolute left-3 top-3.5 text-green-500 text-lg">📍</span>
+                            {geoLoading && <div className="absolute right-3 top-3.5 animate-spin">⌛</div>}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Dropoff Location</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={dropoff}
+                                onChange={(e) => setDropoff(e.target.value)}
+                                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all outline-none"
+                                placeholder="Where are you going?"
+                                onBlur={handlePreviewRoute}
+                                required
+                            />
+                            <span className="absolute left-3 top-3.5 text-red-500 text-lg">🚩</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Offer Your Fare (Optional)</label>
+                        <div className="relative">
+                            <input
+                                type="number"
+                                value={fare}
+                                onChange={(e) => setFare(e.target.value)}
+                                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all outline-none"
+                                placeholder="e.g. 500"
+                            />
+                            <span className="absolute left-3 top-3.5 text-slate-400 font-bold">$</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Vehicle Type</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            {VEHICLE_TYPES.map(type => (
+                                <button
+                                    key={type.value}
+                                    type="button"
+                                    onClick={() => setVehicle(type.value)}
+                                    className={`
+                                        p-3 text-left border rounded-xl transition-all
+                                        ${vehicle === type.value 
+                                            ? 'border-red-600 bg-red-50 ring-1 ring-red-600' 
+                                            : 'border-slate-200 bg-white hover:border-slate-300'}
+                                    `}
+                                >
+                                    <span className="text-xl block mb-1">{type.icon}</span>
+                                    <span className={`text-xs font-bold block ${vehicle === type.value ? 'text-red-700' : 'text-slate-700'}`}>{type.label}</span>
+                                    <span className="text-[10px] text-slate-400 line-clamp-1">{type.desc}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     {error && (
-                        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 flex items-start gap-3">
-                            <svg className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <p className="text-red-400 text-sm">{error}</p>
+                        <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-xs rounded-lg animate-shake">
+                            {error}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full py-4 bg-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-200 hover:bg-red-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? 'Finding Drivers...' : 'Request Ride'}
+                    </button>
+                </form>
+            </div>
 
-                        {/* Pickup */}
-                        <div>
-                            <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                                <span className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">A</span>
-                                Pickup Location
-                            </h3>
-                            <div className="space-y-3">
-                                <input
-                                    id="pickupAddress"
-                                    name="pickupAddress"
-                                    type="text"
-                                    placeholder="Pickup address"
-                                    value={formData.pickupAddress}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
-                                />
-                                <div className="grid grid-cols-2 gap-3">
-                                    <input
-                                        id="pickupLat"
-                                        name="pickupLat"
-                                        type="number"
-                                        step="any"
-                                        placeholder="Latitude (e.g. 31.5204)"
-                                        value={formData.pickupLat}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all text-sm"
-                                    />
-                                    <input
-                                        id="pickupLng"
-                                        name="pickupLng"
-                                        type="number"
-                                        step="any"
-                                        placeholder="Longitude (e.g. 74.3587)"
-                                        value={formData.pickupLng}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all text-sm"
-                                    />
-                                </div>
-                            </div>
+            {/* Map Section */}
+            <div className="flex-1 relative bg-slate-100">
+                <LiveTrackingMap
+                    token={token}
+                    pickupCoords={coords.pickup}
+                    dropoffCoords={coords.dropoff}
+                    initialDrivers={nearbyDrivers}
+                />
+                
+                {(!coords.pickup && !geoLoading) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/20 backdrop-blur-sm z-[1000]">
+                        <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 max-w-xs text-center">
+                            <div className="text-3xl mb-3">🌍</div>
+                            <h3 className="font-bold text-slate-900 mb-2">Enable Location</h3>
+                            <p className="text-slate-500 text-sm mb-4">Allow map access to see drivers around you and set your pickup point.</p>
                         </div>
-
-                        {/* Dotted separator */}
-                        <div className="flex items-center gap-3">
-                            <div className="flex-1 border-t border-slate-700 border-dashed"></div>
-                            <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center">
-                                <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                                </svg>
-                            </div>
-                            <div className="flex-1 border-t border-slate-700 border-dashed"></div>
-                        </div>
-
-                        {/* Dropoff */}
-                        <div>
-                            <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                                <span className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold">B</span>
-                                Dropoff Location
-                            </h3>
-                            <div className="space-y-3">
-                                <input
-                                    id="dropoffAddress"
-                                    name="dropoffAddress"
-                                    type="text"
-                                    placeholder="Dropoff address"
-                                    value={formData.dropoffAddress}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
-                                />
-                                <div className="grid grid-cols-2 gap-3">
-                                    <input
-                                        id="dropoffLat"
-                                        name="dropoffLat"
-                                        type="number"
-                                        step="any"
-                                        placeholder="Latitude"
-                                        value={formData.dropoffLat}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all text-sm"
-                                    />
-                                    <input
-                                        id="dropoffLng"
-                                        name="dropoffLng"
-                                        type="number"
-                                        step="any"
-                                        placeholder="Longitude"
-                                        value={formData.dropoffLng}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all text-sm"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Ride Preferences */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label htmlFor="vehicleType" className="block text-slate-300 text-sm font-medium mb-2">Vehicle Type</label>
-                                <select
-                                    id="vehicleType"
-                                    name="vehicleType"
-                                    value={formData.vehicleType}
-                                    onChange={handleChange}
-                                    className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
-                                >
-                                    {VEHICLE_TYPES.map(type => (
-                                        <option key={type} value={type}>{type}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="offeredPrice" className="block text-slate-300 text-sm font-medium mb-2">
-                                    Your Offer Price <span className="text-slate-500">(optional)</span>
-                                </label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">PKR</span>
-                                    <input
-                                        id="offeredPrice"
-                                        name="offeredPrice"
-                                        type="number"
-                                        step="any"
-                                        min="0"
-                                        placeholder="0"
-                                        value={formData.offeredPrice}
-                                        onChange={handleChange}
-                                        className="w-full bg-slate-700/50 border border-slate-600 rounded-xl pl-14 pr-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Estimates */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label htmlFor="estimatedDistanceKm" className="block text-slate-300 text-sm font-medium mb-2">Distance (km)</label>
-                                <input
-                                    id="estimatedDistanceKm"
-                                    name="estimatedDistanceKm"
-                                    type="number"
-                                    step="any"
-                                    min="0"
-                                    placeholder="e.g. 5.2"
-                                    value={formData.estimatedDistanceKm}
-                                    onChange={handleChange}
-                                    className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="estimatedDurationMin" className="block text-slate-300 text-sm font-medium mb-2">Est. Duration (min)</label>
-                                <input
-                                    id="estimatedDurationMin"
-                                    name="estimatedDurationMin"
-                                    type="number"
-                                    min="0"
-                                    placeholder="e.g. 15"
-                                    value={formData.estimatedDurationMin}
-                                    onChange={handleChange}
-                                    className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Notes */}
-                        <div>
-                            <label htmlFor="notes" className="block text-slate-300 text-sm font-medium mb-2">
-                                Notes <span className="text-slate-500">(optional)</span>
-                            </label>
-                            <textarea
-                                id="notes"
-                                name="notes"
-                                rows={3}
-                                placeholder="Any special instructions for the driver..."
-                                value={formData.notes}
-                                onChange={handleChange}
-                                className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all resize-none"
-                            />
-                        </div>
-
-                        {/* Submit */}
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all duration-200 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 text-lg"
-                        >
-                            {loading ? (
-                                <span className="flex items-center justify-center gap-3">
-                                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                    </svg>
-                                    Posting your ride...
-                                </span>
-                            ) : (
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                    </svg>
-                                    Request Ride & Get Bids
-                                </span>
-                            )}
-                        </button>
-                    </form>
-                </div>
-
-                {/* Quick tip */}
-                <div className="mt-6 flex items-start gap-3 bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-                    <svg className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <p className="text-blue-300 text-sm">
-                        <strong>How it works:</strong> After posting, nearby drivers will place bids. You can compare bids and choose the best offer — just like InDrive!
-                    </p>
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );
